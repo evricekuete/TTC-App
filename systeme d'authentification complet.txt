@@ -1,0 +1,88 @@
+## Bing
+Bien sûr ! Voici un exemple de système d'inscription et de connexion en PHP et MySQLi avec des formulaires stylisés, inspirés du style de Canva.com. Nous allons créer deux fichiers : login.php et register.php.
+1. Formulaire d'inscription (register.php)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="style.css"> <!-- Assurez-vous d'avoir un fichier CSS pour le style -->
+</head>
+<body>
+    <h1>Inscription</h1>
+    <form action="register_process.php" method="post">
+        <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+        <input type="email" name="email" placeholder="Adresse e-mail" required>
+        <input type="password" name="password" placeholder="Mot de passe" required>
+        <label><input type="checkbox" name="remember"> Se souvenir de moi</label>
+        <button type="submit">S'inscrire</button>
+    </form>
+</body>
+</html>
+
+2. Traitement du formulaire d'inscription (register_process.php)
+<?php
+session_start();
+require('config.php'); // Assurez-vous d'avoir un fichier de configuration pour la connexion à la base de données
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $email = $_POST['email'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Hashage du mot de passe
+
+    // Insérez les données dans la table 'users'
+    $query = "INSERT INTO users (username, email, password) VALUES ('$username', '$email', '$password')";
+    mysqli_query($conn, $query);
+
+    // Redirigez l'utilisateur vers la page de connexion
+    header('Location: login.php');
+    exit;
+}
+?>
+
+3. Formulaire de connexion (login.php)
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link rel="stylesheet" href="style.css"> <!-- Assurez-vous d'avoir un fichier CSS pour le style -->
+</head>
+<body>
+    <h1>Connexion</h1>
+    <form action="login_process.php" method="post">
+        <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+        <input type="password" name="password" placeholder="Mot de passe" required>
+        <label><input type="checkbox" name="remember"> Se souvenir de moi</label>
+        <button type="submit">Se connecter</button>
+    </form>
+</body>
+</html>
+
+4. Traitement du formulaire de connexion (login_process.php)
+<?php
+session_start();
+require('config.php'); // Assurez-vous d'avoir un fichier de configuration pour la connexion à la base de données
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    // Vérifiez les informations d'identification dans la table 'users'
+    $query = "SELECT * FROM users WHERE username='$username'";
+    $result = mysqli_query($conn, $query);
+    $user = mysqli_fetch_assoc($result);
+
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        header('Location: dashboard.php'); // Redirigez vers la page d'accueil après connexion
+        exit;
+    } else {
+        echo "Identifiants incorrects. Veuillez réessayer.";
+    }
+}
+?>
+
+N'oubliez pas d'ajouter le fichier de configuration (config.php) pour la connexion à la base de données, ainsi qu'un fichier CSS (style.css) pour styliser vos formulaires. Vous pouvez personnaliser le style selon vos préférences. Bon développement ! 🚀
